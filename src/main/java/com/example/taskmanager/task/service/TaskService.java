@@ -1,6 +1,10 @@
 package com.example.taskmanager.task.service;
 
+import com.example.taskmanager.errors.ResourceNotFoundException;
 import com.example.taskmanager.task.Task;
+import com.example.taskmanager.task.dto.CreateTaskDTO;
+import com.example.taskmanager.task.dto.TaskResponseDTO;
+import com.example.taskmanager.task.mapper.TaskMapper;
 import com.example.taskmanager.task.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,24 +20,28 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
+    public TaskResponseDTO createTask(CreateTaskDTO taskDTO) {
+        Task savedTask = taskRepository.save(TaskMapper.toEntity(taskDTO));
+        return TaskMapper.toDTO(savedTask);
     }
 
-    public List<Task> getTasks() {
-        return taskRepository.findAll();
+    public List<TaskResponseDTO> getTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return TaskMapper.toDTO(tasks);
     }
 
-    public Task getTaskById(Long id) {
-        return taskRepository.findById(id)
-                .orElseThrow();
+    public TaskResponseDTO getTaskById(Long id) {
+        Task savedTask = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No task with id " + id + " was found"));
+        return TaskMapper.toDTO(savedTask);
     }
 
-    public Task updateTask(Long id, Task updatedTask) {
+    public TaskResponseDTO updateTask(Long id, CreateTaskDTO updatedTaskDto) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow();
-        existingTask.setCompleted(updatedTask.isCompleted());
-        existingTask.setDescription(updatedTask.getDescription());
-        return taskRepository.save(existingTask);
+        existingTask.setCompleted(updatedTaskDto.getCompleted());
+        existingTask.setDescription(updatedTaskDto.getDescription());
+        Task savedTask = taskRepository.save(existingTask);
+        return TaskMapper.toDTO(savedTask);
     }
 }
