@@ -1,6 +1,8 @@
 package com.example.taskmanager.user.controller;
 
 import com.example.taskmanager.user.User;
+import com.example.taskmanager.user.dto.CreateUserDTO;
+import com.example.taskmanager.user.dto.UserResponseDTO;
 import com.example.taskmanager.user.repository.UserRepository;
 import com.example.taskmanager.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,22 +27,22 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody CreateUserDTO userDto) {
+        return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(),HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody CreateUserDTO updatedUser) {
         return new ResponseEntity<>(userService.updateUser(id, updatedUser), HttpStatus.OK);
     }
 }
