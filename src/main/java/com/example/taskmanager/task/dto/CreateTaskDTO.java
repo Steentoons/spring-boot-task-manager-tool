@@ -2,18 +2,13 @@ package com.example.taskmanager.task.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CreateTaskDTO {
+public record CreateTaskDTO (
     @NotBlank(message = "description is required")
     @NotNull(message = "description is required")
-    private String description;
+    String description,
 
     @NotNull(message = "completed is required")
-    private Boolean completed;
-}
+    @NotNull(message = "completed is required")
+    Boolean completed
+) {}

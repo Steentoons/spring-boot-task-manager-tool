@@ -17,12 +17,10 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
-    public final UserRepository userRepository;
     public UserService userService;
 
     @Autowired
-    public UserController(UserRepository userRepository, UserService userService) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 

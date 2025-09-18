@@ -14,6 +14,7 @@ import java.util.List;
 @Service
 public class TaskService {
     public final TaskRepository taskRepository;
+    private TaskMapper taskMapper;
 
     @Autowired
     public TaskService(TaskRepository taskRepository) {
@@ -21,27 +22,30 @@ public class TaskService {
     }
 
     public TaskResponseDTO createTask(CreateTaskDTO taskDTO) {
-        Task savedTask = taskRepository.save(TaskMapper.toEntity(taskDTO));
-        return TaskMapper.toDTO(savedTask);
+        Task savedTask = taskRepository.save(taskMapper.toEntity(taskDTO));
+        return taskMapper.toDto(savedTask);
     }
 
     public List<TaskResponseDTO> getTasks() {
         List<Task> tasks = taskRepository.findAll();
-        return TaskMapper.toDTO(tasks);
+        return tasks.stream()
+                .map(task -> taskMapper.toDto(task))
+                .toList();
     }
 
     public TaskResponseDTO getTaskById(Long id) {
         Task savedTask = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No task with id " + id + " was found"));
-        return TaskMapper.toDTO(savedTask);
+        return taskMapper.toDto(savedTask);
     }
 
     public TaskResponseDTO updateTask(Long id, CreateTaskDTO updatedTaskDto) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow();
-        existingTask.setCompleted(updatedTaskDto.getCompleted());
-        existingTask.setDescription(updatedTaskDto.getDescription());
+        Task task = taskMapper.toEntity(updatedTaskDto);
+        existingTask.setCompleted(task.isCompleted());
+        existingTask.setDescription(task.getDescription());
         Task savedTask = taskRepository.save(existingTask);
-        return TaskMapper.toDTO(savedTask);
+        return taskMapper.toDto(savedTask);
     }
 }
