@@ -13,6 +13,7 @@ import java.util.List;
 @Service
 public class UserService {
     public final UserRepository userRepository;
+    private UserMapper userMapper;
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -20,28 +21,32 @@ public class UserService {
     }
 
     public UserResponseDTO createUser(CreateUserDTO userDto) {
-        User user = UserMapper.toEntity(userDto);
+        User user = userMapper.toEntity(userDto);
         User savedUser = userRepository.save(user);
-        return UserMapper.toDTO(savedUser);
+        return userMapper.toUserResponseDto(savedUser);
     }
 
     public List<UserResponseDTO> getAllUsers() {
-        return UserMapper.toDTO(userRepository.findAll());
+        List<User> fetchedUsers = userRepository.findAll();
+        return fetchedUsers.stream()
+                .map(user -> userMapper.toUserResponseDto(user))
+                .toList();
     }
 
     public UserResponseDTO getUserById(Long id) {
         User userById = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No user was found with the id" + id));
 
-        return UserMapper.toDTO(userById);
+        return userMapper.toUserResponseDto(userById);
     }
 
     public UserResponseDTO updateUser(Long id, CreateUserDTO updatedUserDto) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No user was found with the id " + id));
 
-        existingUser.setUsername(updatedUserDto.getUsername());
+        User userToUpdate = userMapper.toEntity(updatedUserDto);
+        existingUser.setUsername(userToUpdate.getUsername());
         User savedUser = userRepository.save(existingUser);
-        return UserMapper.toDTO(savedUser);
+        return userMapper.toUserResponseDto(savedUser);
     }
 }
