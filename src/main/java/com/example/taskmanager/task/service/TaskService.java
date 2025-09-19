@@ -4,6 +4,7 @@ import com.example.taskmanager.errors.ResourceNotFoundException;
 import com.example.taskmanager.task.Task;
 import com.example.taskmanager.task.dto.CreateTaskDTO;
 import com.example.taskmanager.task.dto.TaskResponseDTO;
+import com.example.taskmanager.task.dto.UpdateTaskDto;
 import com.example.taskmanager.task.mapper.TaskMapper;
 import com.example.taskmanager.task.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,12 @@ import java.util.List;
 
 @Service
 public class TaskService {
-    public final TaskRepository taskRepository;
-    private TaskMapper taskMapper;
+    private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+        this.taskMapper = taskMapper;
         this.taskRepository = taskRepository;
     }
 
@@ -28,8 +30,10 @@ public class TaskService {
 
     public List<TaskResponseDTO> getTasks() {
         List<Task> tasks = taskRepository.findAll();
+        System.out.println("=======================================================");
+        tasks.forEach(System.out::println);
         return tasks.stream()
-                .map(task -> taskMapper.toDto(task))
+                .map(taskMapper::toDto)
                 .toList();
     }
 
@@ -39,12 +43,10 @@ public class TaskService {
         return taskMapper.toDto(savedTask);
     }
 
-    public TaskResponseDTO updateTask(Long id, CreateTaskDTO updatedTaskDto) {
+    public TaskResponseDTO updateTask(Long id, UpdateTaskDto updatedTaskDto) {
         Task existingTask = taskRepository.findById(id)
                 .orElseThrow();
-        Task task = taskMapper.toEntity(updatedTaskDto);
-        existingTask.setCompleted(task.isCompleted());
-        existingTask.setDescription(task.getDescription());
+        Task task = taskMapper.toUpdateTaskDto(updatedTaskDto, existingTask);
         Task savedTask = taskRepository.save(existingTask);
         return taskMapper.toDto(savedTask);
     }

@@ -2,6 +2,7 @@ package com.example.taskmanager.user.controller;
 
 import com.example.taskmanager.user.User;
 import com.example.taskmanager.user.dto.CreateUserDTO;
+import com.example.taskmanager.user.dto.UpdateUserDto;
 import com.example.taskmanager.user.dto.UserResponseDTO;
 import com.example.taskmanager.user.repository.UserRepository;
 import com.example.taskmanager.user.service.UserService;
@@ -24,23 +25,23 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
+    @PostMapping("/create_user")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody CreateUserDTO userDto) {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/fetch_all_users")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(),HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get_user_by_id/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody CreateUserDTO updatedUser) {
+    @PutMapping("/update_user/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody UpdateUserDto updatedUser) {
         return new ResponseEntity<>(userService.updateUser(id, updatedUser), HttpStatus.OK);
     }
 }

@@ -2,6 +2,7 @@ package com.example.taskmanager.task.controller;
 
 import com.example.taskmanager.task.dto.CreateTaskDTO;
 import com.example.taskmanager.task.dto.TaskResponseDTO;
+import com.example.taskmanager.task.dto.UpdateTaskDto;
 import com.example.taskmanager.task.repository.TaskRepository;
 import com.example.taskmanager.task.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> updateTask(@RequestBody CreateTaskDTO updatedTaskDto, @PathVariable Long id) {
+    public ResponseEntity<TaskResponseDTO> updateTask(@RequestBody UpdateTaskDto updatedTaskDto, @PathVariable Long id) {
         return new ResponseEntity<TaskResponseDTO>(taskService.updateTask(id, updatedTaskDto), HttpStatus.OK);
     }
 }
