@@ -2,6 +2,7 @@ package com.example.taskmanager.user.service;
 
 import com.example.taskmanager.user.User;
 import com.example.taskmanager.user.dto.CreateUserDTO;
+import com.example.taskmanager.user.dto.UpdateUserDto;
 import com.example.taskmanager.user.dto.UserResponseDTO;
 import com.example.taskmanager.user.mapper.UserMapper;
 import com.example.taskmanager.user.repository.UserRepository;
@@ -12,12 +13,13 @@ import java.util.List;
 
 @Service
 public class UserService {
-    public final UserRepository userRepository;
-    private UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     public UserResponseDTO createUser(CreateUserDTO userDto) {
@@ -29,7 +31,7 @@ public class UserService {
     public List<UserResponseDTO> getAllUsers() {
         List<User> fetchedUsers = userRepository.findAll();
         return fetchedUsers.stream()
-                .map(user -> userMapper.toUserResponseDto(user))
+                .map(userMapper::toUserResponseDto)
                 .toList();
     }
 
@@ -40,13 +42,13 @@ public class UserService {
         return userMapper.toUserResponseDto(userById);
     }
 
-    public UserResponseDTO updateUser(Long id, CreateUserDTO updatedUserDto) {
+    public UserResponseDTO updateUser(Long id, UpdateUserDto updatedUserDto) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No user was found with the id " + id));
 
-        User userToUpdate = userMapper.toEntity(updatedUserDto);
-        existingUser.setUsername(userToUpdate.getUsername());
-        User savedUser = userRepository.save(existingUser);
+        User userToUpdate = userMapper.toUpdateUserDto(updatedUserDto, existingUser);
+//        existingUser.setUsername(userToUpdate.getUsername());
+        User savedUser = userRepository.save(userToUpdate);
         return userMapper.toUserResponseDto(savedUser);
     }
 }
